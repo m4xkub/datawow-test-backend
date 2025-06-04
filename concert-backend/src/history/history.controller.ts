@@ -6,7 +6,7 @@ export class HistoryController {
   constructor(private readonly historyService: HistoryService) {}
 
   @Get()
-  getUsers(): string {
+  getHistory(): string {
     return this.historyService.getHistory();
   }
 }
