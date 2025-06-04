@@ -8,8 +8,8 @@ import {
 
 @Entity()
 export class History {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @CreateDateColumn()
   timestamp: Date;
