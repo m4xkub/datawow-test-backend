@@ -1,6 +1,7 @@
 import { Body, Controller, Delete, Get, Patch, Post } from '@nestjs/common';
 import { HistoryService } from './history.service';
-import { HistoryAction, HistoryDto } from './dto/historyDto';
+import { HistoryDto } from './dto/historyDto';
+import { Action } from 'src/config/action';
 
 @Controller('history')
 export class HistoryController {
@@ -14,7 +15,7 @@ export class HistoryController {
           timestamp: 'test',
           username: 'test',
           concertName: 'clo',
-          action: HistoryAction.CANCELED,
+          action: Action.CANCELED,
         },
       ],
     };
