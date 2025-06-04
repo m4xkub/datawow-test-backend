@@ -1,7 +1,7 @@
 import { IsString, IsInt, Min } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
-export class CreateConcertDto {
+export class ConcertDto {
   @ApiProperty({ example: 'Coldplay Live in Bangkok' })
   @IsString()
   name: string;
