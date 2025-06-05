@@ -10,6 +10,7 @@ async function bootstrap() {
     .setTitle('Concert Reservation API')
     .setDescription('API for managing concert tickets')
     .setVersion('1.0')
+    .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document); // Visit /api to view Swagger UI

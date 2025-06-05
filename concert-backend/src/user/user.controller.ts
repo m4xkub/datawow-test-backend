@@ -1,14 +1,32 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  ForbiddenException,
+  Get,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { LoginDto } from './dto/LoginDto';
 import { RegisterDto } from './dto/registerDto';
-
+import { UserGuard } from './user.guard';
+import { ApiBearerAuth } from '@nestjs/swagger';
+import { Role } from 'src/config/role';
+@ApiBearerAuth()
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get()
-  async getUsers(): Promise<any> {
+  @UseGuards(UserGuard)
+  async getUsers(@Req() req): Promise<any> {
+    const user = req.user;
+    if (user != Role.ADMIN) {
+      console.log('Role :', user);
+      throw new ForbiddenException('Admin only');
+    }
+
     const res = await this.userService.getUsers();
     console.log('--------get-user--------');
     console.log(res);
