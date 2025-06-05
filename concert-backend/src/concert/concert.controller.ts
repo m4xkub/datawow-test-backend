@@ -22,43 +22,34 @@ export class ConcertController {
   constructor(private readonly concertService: ConcertService) {}
 
   @Get('/getAll')
-  getConcerts(): { concerts: ConcertDto[] } {
+  async getConcerts() {
     // replace array with actual service that return array of ConcertDto
-    return {
-      concerts: [{ name: 'cold', description: 'play', seats: 2 }],
-    };
+    return await this.concertService.getConcerts();
   }
 
   @Get('/:id')
-  getConcertById(@Param('id', ParseIntPipe) id: number): {
-    concert: ConcertDto;
-  } {
+  async getConcertById(@Param('id', ParseIntPipe) id: string) {
     // replace array with actual service that return ConcertDto
-    console.log('id : ', id);
-    return {
-      concert: { name: 'cold', description: 'play', seats: 2 },
-    };
+    const res = await this.concertService.getConcertById(id);
+    return res;
   }
 
   @UseGuards(AuthGuard)
   @Post('/create')
-  createConcert(@Body() obj: ConcertDto, @Req() req) {
+  async createConcert(@Body() obj: ConcertDto, @Req() req) {
     console.log('Received concert:', obj);
     if (req.user != Role.ADMIN) {
       console.log('Role :', req.user);
       throw new ForbiddenException('Admin only');
     }
     // TODO : add it to database
-    return {
-      message: 'Concert entry created',
-      data: obj,
-    };
+    const res = await this.concertService.createConcert(obj);
+    return res;
   }
-
   @UseGuards(AuthGuard)
   @Patch('/update/:id')
-  updateConcert(
-    @Param('id', ParseIntPipe) id: number,
+  async updateConcert(
+    @Param('id', ParseIntPipe) id: string,
     @Body() updatedObj: UpdateConcertDto,
     @Req() req,
   ) {
@@ -66,22 +57,17 @@ export class ConcertController {
       console.log('Role :', req.user);
       throw new ForbiddenException('Admin only');
     }
-    return {
-      message: 'Concert updated',
-      data: updatedObj,
-      id: id,
-    };
+    const res = await this.concertService.updateConcert(id, updatedObj);
+    return res;
   }
 
   @Delete('/delete/:id')
-  deleteConcert(@Param('id', ParseIntPipe) id: string, @Req() req) {
+  async deleteConcert(@Param('id', ParseIntPipe) id: string, @Req() req) {
     if (req.user != Role.ADMIN) {
       console.log('Role :', req.user);
       throw new ForbiddenException('Admin only');
     }
-    return {
-      message: 'Concert deleted',
-      id: id,
-    };
+    const res = await this.concertService.deleteConcert(id);
+    return res;
   }
 }

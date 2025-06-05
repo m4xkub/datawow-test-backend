@@ -6,11 +6,10 @@ import { HistoryDto } from './dto/historyDto';
 
 @Injectable()
 export class HistoryService {
-  //   constructor(
-  //     @InjectRepository(History)
-  //     private historyRepo: Repository<History>,
-  //   ) {}
-  historyRepo;
+  constructor(
+    @InjectRepository(History)
+    private historyRepo: Repository<History>,
+  ) {}
   async getHistories() {
     const res = await this.historyRepo.find();
     if (!res) {
