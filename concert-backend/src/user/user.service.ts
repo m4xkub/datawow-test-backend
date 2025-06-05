@@ -4,12 +4,16 @@ import { RegisterDto } from './dto/registerDto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
 import { Repository } from 'typeorm';
+import * as bcrypt from 'bcrypt';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private userRepo: Repository<User>,
+    private jwtService: JwtService,
   ) {}
 
   async getUsers() {
@@ -22,10 +26,13 @@ export class UserService {
     });
 
     // do this to prevent malecious user to do a brute-force attack (by knowing username or password is wrong)
-    if (!user || user.password !== obj.password) {
+    if (!user || !(await bcrypt.compare(obj.password, user.password))) {
       throw new BadRequestException('Username or password is incorrect');
     }
-    return { message: 'Login successful' };
+
+    const payload = { id: user.id, username: user.username, role: user.role };
+    const token = this.jwtService.sign(payload);
+    return { message: 'Login successful', token };
   }
 
   logout() {}
@@ -36,10 +43,13 @@ export class UserService {
     });
     if (exist) throw new BadRequestException('Username is already existed');
 
-    const user = this.userRepo.create(obj);
+    const hashed = await bcrypt.hash(obj.password, 10);
+    const user = this.userRepo.create({ ...obj, password: hashed });
+    await this.userRepo.save(user);
 
-    const saved = await this.userRepo.save(user);
+    const payload = { id: user.id, username: user.username, role: user.role };
+    const token = this.jwtService.sign(payload);
 
-    return { message: 'Register successful' };
+    return { message: 'Register successful', token };
   }
 }
