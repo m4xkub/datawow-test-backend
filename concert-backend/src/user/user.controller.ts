@@ -10,16 +10,16 @@ import {
 import { UserService } from './user.service';
 import { LoginDto } from './dto/LoginDto';
 import { RegisterDto } from './dto/registerDto';
-import { UserGuard } from './user.guard';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { Role } from 'src/config/role';
+import { AuthGuard } from 'src/guard/auth.guard';
 @ApiBearerAuth()
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get()
-  @UseGuards(UserGuard)
+  @UseGuards(AuthGuard)
   async getUsers(@Req() req): Promise<any> {
     const user = req.user;
     if (user != Role.ADMIN) {
