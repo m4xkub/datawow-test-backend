@@ -31,7 +31,7 @@ export class UserService {
 
     const payload = { id: user.id, username: user.username, role: user.role };
     const token = this.jwtService.sign(payload);
-    return { message: 'Login successful', token };
+    return { message: 'Login successful', token, role: user.role };
   }
 
   logout() {}
@@ -49,6 +49,6 @@ export class UserService {
     const payload = { id: user.id, username: user.username, role: user.role };
     const token = this.jwtService.sign(payload);
 
-    return { message: 'Register successful', token };
+    return { message: 'Register successful', token, role: user.role };
   }
 }
