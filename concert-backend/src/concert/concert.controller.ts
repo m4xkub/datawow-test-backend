@@ -61,6 +61,7 @@ export class ConcertController {
     return res;
   }
 
+  @UseGuards(AuthGuard)
   @Delete('/delete/:id')
   async deleteConcert(@Param('id', ParseIntPipe) id: string, @Req() req) {
     if (req.user != Role.ADMIN) {
