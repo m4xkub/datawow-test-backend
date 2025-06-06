@@ -17,6 +17,9 @@ export class History {
   @Column()
   concertName: string;
 
+  @Column()
+  username: string;
+
   @Column({
     type: 'enum',
     enum: Action,
