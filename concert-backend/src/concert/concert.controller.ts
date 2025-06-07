@@ -21,7 +21,7 @@ import { AuthGuard } from 'src/guard/auth.guard';
 export class ConcertController {
   constructor(private readonly concertService: ConcertService) {}
 
-  @Get('/getAll')
+  @Get()
   async getConcerts() {
     // replace array with actual service that return array of ConcertDto
     return await this.concertService.getConcerts();
@@ -63,12 +63,18 @@ export class ConcertController {
 
   @UseGuards(AuthGuard)
   @Delete('/delete/:id')
-  async deleteConcert(@Param('id', ParseIntPipe) id: string, @Req() req) {
+  async deleteConcert(@Param('id') id: string, @Req() req) {
     if (req.user != Role.ADMIN) {
       console.log('Role :', req.user);
       throw new ForbiddenException('Admin only');
     }
     const res = await this.concertService.deleteConcert(id);
     return res;
+  }
+
+  @UseGuards(AuthGuard)
+  @Post('/reserve')
+  async reserveSeat() {
+    return;
   }
 }

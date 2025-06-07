@@ -51,6 +51,7 @@ export class ConcertService {
 
   async deleteConcert(id: string): Promise<{ message: string }> {
     const res = await this.concertRepo.delete(id);
+    console.log(id);
     if (res.affected === 0) throw new NotFoundException('Concert not found');
     return { message: 'Concert deleted successfully' };
   }
