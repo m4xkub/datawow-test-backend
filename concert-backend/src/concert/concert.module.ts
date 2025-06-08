@@ -1,14 +1,16 @@
 import { Module } from '@nestjs/common';
 import { ConcertService } from './concert.service';
 import { ConcertController } from './concert.controller';
-import { Concert } from './concert.entity';
+import { Concert } from '../entities/concert.entity';
+import { History } from '../entities/history.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { Reserve } from 'src/entities/reserve.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Concert]),
+    TypeOrmModule.forFeature([Concert, History, Reserve]),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: (config: ConfigService) => {

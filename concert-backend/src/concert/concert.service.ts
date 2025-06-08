@@ -1,14 +1,26 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Concert } from './concert.entity';
+import { Concert } from '../entities/concert.entity';
+import { History } from '../entities/history.entity';
 import { ConcertDto } from './dto/concertDto';
+import { Reserve } from 'src/entities/reserve.entity';
 
 @Injectable()
 export class ConcertService {
   constructor(
     @InjectRepository(Concert)
     private concertRepo: Repository<Concert>,
+
+    @InjectRepository(Reserve)
+    private reserveRepo: Repository<Reserve>,
+
+    @InjectRepository(History)
+    private historyRepo: Repository<History>,
   ) {}
   async getConcerts(): Promise<{ message: string; result: Concert[] }> {
     const res = await this.concertRepo.find();
@@ -54,5 +66,48 @@ export class ConcertService {
     console.log(id);
     if (res.affected === 0) throw new NotFoundException('Concert not found');
     return { message: 'Concert deleted successfully' };
+  }
+
+  async reserveSeat(obj: { userId: string; concertId: string }) {
+    const exist = await this.reserveRepo.findOne({
+      where: { userId: obj.userId, concertId: obj.concertId },
+    });
+
+    if (exist) {
+      throw new BadRequestException('User already reserved this concert.');
+    }
+    const reserve = this.reserveRepo.create(obj);
+    const res = await this.reserveRepo.save(reserve);
+
+    return {
+      message: 'reserve seat success',
+      result: res,
+    };
+  }
+
+  async cancelSeat(obj: { userId: string; concertId: string }) {
+    const res = await this.reserveRepo.delete(obj);
+    if (res.affected === 0) throw new NotFoundException('Reserve not found');
+    return { message: 'Reserve deleted successfully', result: res };
+  }
+
+  async getTotalSeats() {
+    const total = await this.concertRepo
+      .createQueryBuilder('concert')
+      .select('SUM(concert.seats)', 'sum')
+      .getRawOne();
+
+    return { result: parseInt(total.sum, 10) || 0 };
+  }
+
+  async isReserved(obj: { userId: string; concertId: string }) {
+    const exist = await this.reserveRepo.findOne({
+      where: { userId: obj.userId, concertId: obj.concertId },
+    });
+
+    if (exist) {
+      return { result: true };
+    }
+    return { result: false };
   }
 }

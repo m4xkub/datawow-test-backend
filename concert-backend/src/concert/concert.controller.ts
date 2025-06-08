@@ -16,6 +16,7 @@ import { ConcertDto } from './dto/concertDto';
 import { UpdateConcertDto } from './dto/updateConcertDto';
 import { Role } from 'src/config/role';
 import { AuthGuard } from 'src/guard/auth.guard';
+import { Reserve } from 'src/entities/reserve.entity';
 
 @Controller('concert')
 export class ConcertController {
@@ -23,13 +24,23 @@ export class ConcertController {
 
   @Get()
   async getConcerts() {
-    // replace array with actual service that return array of ConcertDto
     return await this.concertService.getConcerts();
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('/totalseats')
+  async getTotalSeats(@Req() req) {
+    if (req.user != Role.ADMIN) {
+      console.log('Role :', req.user);
+      throw new ForbiddenException('Admin only');
+    }
+
+    const res = await this.concertService.getTotalSeats();
+    return res;
   }
 
   @Get('/:id')
   async getConcertById(@Param('id', ParseIntPipe) id: string) {
-    // replace array with actual service that return ConcertDto
     const res = await this.concertService.getConcertById(id);
     return res;
   }
@@ -42,7 +53,6 @@ export class ConcertController {
       console.log('Role :', req.user);
       throw new ForbiddenException('Admin only');
     }
-    // TODO : add it to database
     const res = await this.concertService.createConcert(obj);
     return res;
   }
@@ -74,7 +84,31 @@ export class ConcertController {
 
   @UseGuards(AuthGuard)
   @Post('/reserve')
-  async reserveSeat() {
-    return;
+  async reserveSeat(@Body() obj: { concertId }, @Req() req) {
+    const res = await this.concertService.reserveSeat({
+      userId: req.id,
+      concertId: obj.concertId,
+    });
+    return res;
+  }
+
+  @UseGuards(AuthGuard)
+  @Post('/cancel')
+  async cancelSeat(@Body() obj: { concertId }, @Req() req) {
+    const res = await this.concertService.cancelSeat({
+      userId: req.id,
+      concertId: obj.concertId,
+    });
+    return res;
+  }
+
+  @UseGuards(AuthGuard)
+  @Post('/isReserved')
+  async isReserved(@Body() obj: { concertId }, @Req() req) {
+    const res = await this.concertService.isReserved({
+      userId: req.id,
+      concertId: obj.concertId,
+    });
+    return res;
   }
 }
