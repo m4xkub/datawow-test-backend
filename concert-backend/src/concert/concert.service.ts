@@ -18,9 +18,6 @@ export class ConcertService {
 
     @InjectRepository(Reserve)
     private reserveRepo: Repository<Reserve>,
-
-    @InjectRepository(History)
-    private historyRepo: Repository<History>,
   ) {}
   async getConcerts(): Promise<{ message: string; result: Concert[] }> {
     const res = await this.concertRepo.find();
@@ -76,6 +73,19 @@ export class ConcertService {
     if (exist) {
       throw new BadRequestException('User already reserved this concert.');
     }
+
+    const reservedCount = await this.reserveRepo.count({
+      where: { concertId: obj.concertId },
+    });
+
+    const targetConcert = await this.concertRepo.findOne({
+      where: { id: obj.concertId },
+    });
+
+    if (reservedCount === targetConcert.seats) {
+      throw new BadRequestException('No available seats for this concert.');
+    }
+
     const reserve = this.reserveRepo.create(obj);
     const res = await this.reserveRepo.save(reserve);
 
