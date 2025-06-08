@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 import { HistoryService } from './history.service';
 import { HistoryDto } from './dto/historyDto';
-import { History } from './history.entity';
+import { History } from '../entities/history.entity';
 import { Role } from 'src/config/role';
 import { AuthGuard } from 'src/guard/auth.guard';
 
@@ -23,15 +23,18 @@ export class HistoryController {
 
   @Get()
   @UseGuards(AuthGuard)
-  async getHistories(
-    @Req() req,
-  ): Promise<{ message: string; result: History[] }> {
-    if (req.user != Role.ADMIN) {
+  async getHistories(@Req() req) {
+    if (req.user == Role.ADMIN) {
+      const res = await this.historyService.getHistories();
+      console.log(res);
+      return res;
+    } else if (req.user == Role.USER) {
+      const res = await this.historyService.getHistoriesForUser(req.username);
+      return res;
+    } else {
       console.log('Role :', req.user);
       throw new ForbiddenException('Admin only');
     }
-    const res = await this.historyService.getHistories();
-    return res;
   }
 
   @Post('/create')
@@ -42,8 +45,29 @@ export class HistoryController {
     }
 
     console.log('Received history:', obj);
-    // TODO : add it to database
-    const res = await this.historyService.createHistory(obj);
+    const res = await this.historyService.createHistory(obj, req.username);
+    return res;
+  }
+
+  @Get('/reserve')
+  @UseGuards(AuthGuard)
+  async getNumReserve(@Req() req): Promise<{ result: number }> {
+    if (req.user != Role.ADMIN) {
+      console.log('Role :', req.user);
+      throw new ForbiddenException('Admin only');
+    }
+    const res = await this.historyService.getNumReserve();
+    return res;
+  }
+
+  @Get('/cancel')
+  @UseGuards(AuthGuard)
+  async getNumCancel(@Req() req): Promise<{ result: number }> {
+    if (req.user != Role.ADMIN) {
+      console.log('Role :', req.user);
+      throw new ForbiddenException('Admin only');
+    }
+    const res = await this.historyService.getNumCancel();
     return res;
   }
 }
