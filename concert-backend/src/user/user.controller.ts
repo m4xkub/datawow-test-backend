@@ -51,9 +51,4 @@ export class UserController {
     console.log('--------login--------');
     return res;
   }
-
-  @Get('/logout')
-  logout(): any {
-    return this.userService.logout(); // could clear session/token
-  }
 }

@@ -34,8 +34,6 @@ export class UserService {
     return { message: 'Login successful', token, role: user.role };
   }
 
-  logout() {}
-
   async register(obj: RegisterDto) {
     const exist = await this.userRepo.findOne({
       where: { username: obj.username },
