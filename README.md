@@ -40,6 +40,12 @@ NEST version 11
 $ npm install
 ```
 
+## Creating Mysql Container (for dev environment)
+
+```bash
+$ docker compose up -d
+```
+
 ## Running the app
 
 ```bash
