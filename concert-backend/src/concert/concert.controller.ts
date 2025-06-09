@@ -16,7 +16,6 @@ import { ConcertDto } from './dto/concertDto';
 import { UpdateConcertDto } from './dto/updateConcertDto';
 import { Role } from 'src/config/role';
 import { AuthGuard } from 'src/guard/auth.guard';
-import { Reserve } from 'src/entities/reserve.entity';
 
 @Controller('concert')
 export class ConcertController {
