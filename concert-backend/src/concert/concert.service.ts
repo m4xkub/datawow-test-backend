@@ -41,7 +41,14 @@ export class ConcertService {
   async createConcert(
     obj: ConcertDto,
   ): Promise<{ message: string; result: Concert }> {
-    const concert = this.concertRepo.create(obj);
+    const exist = await this.concertRepo.findOne({
+      where: { name: obj.name },
+    });
+
+    if (exist) {
+      throw new BadRequestException('Concert with this name already exists');
+    }
+    const concert = await this.concertRepo.create(obj);
     const res = await this.concertRepo.save(concert);
 
     return {
